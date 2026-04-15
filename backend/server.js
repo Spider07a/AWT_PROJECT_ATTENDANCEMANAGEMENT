@@ -2,10 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// ✅ Only load .env in local
+// ✅ Load env FIRST
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
+
+// ✅ Now check env
+console.log("MONGO_URI:", process.env.MONGO_URI ? "FOUND ✅" : "MISSING ❌");
 
 // Connect Database
 connectDB();
