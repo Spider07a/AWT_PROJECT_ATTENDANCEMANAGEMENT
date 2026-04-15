@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
-dotenv.config();
+// ✅ Only load .env in local
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 // Connect Database
 connectDB();
@@ -13,10 +15,9 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// ✅ FIXED CORS (handles localhost + Vercel + anything during dev)
+// CORS
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (like Postman)
     if (!origin) return callback(null, true);
 
     const allowedOrigins = [
@@ -28,7 +29,7 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, true); // allow anyway (safe for dev)
+      callback(null, true);
     }
   },
   credentials: true
@@ -40,7 +41,7 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/subjects', require('./routes/subjectRoutes'));
 app.use('/api/attendance', require('./routes/attendanceRoutes'));
 
-// Health check
+// Health
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
