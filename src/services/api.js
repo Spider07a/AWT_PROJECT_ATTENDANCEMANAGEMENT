@@ -1,22 +1,28 @@
 import axios from 'axios';
 
+// ✅ PRODUCTION + LOCAL HANDLING
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://awt-project-attendancemanagement.onrender.com/api";
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api', // Will use Vercel Env Var in Prod, Localhost in Dev
-  timeout: 10000, // increased timeout for potentially slower initial Render cold starts
+  baseURL: API_URL,
+  timeout: 15000, // safer for Render cold start
 });
 
-// Interceptor to attach the JWT Authorization token to every request automatically
-api.interceptors.request.use((config) => {
-  const userString = localStorage.getItem('user');
-  if (userString) {
-    const user = JSON.parse(userString);
-    if (user.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
+// ✅ Attach JWT automatically
+api.interceptors.request.use(
+  (config) => {
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      const user = JSON.parse(userString);
+      if (user.token) {
+        config.headers.Authorization = `Bearer ${user.token}`;
+      }
     }
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default api;
